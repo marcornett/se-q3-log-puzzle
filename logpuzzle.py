@@ -36,7 +36,8 @@ def read_urls(filename):
     if filename == "place_code.google.com":
         # ?  sort by the the last for characters in the string ?
         special_pattern = re.compile(r'puzzle\/\w*-\w*-(\w*).jpg')
-        return sorted(list(set(matches)), key=lambda url: special_pattern.findall(url))
+        return sorted(list(set(matches)),
+                      key=lambda url: special_pattern.findall(url))
     elif filename == "animal_code.google.com":
         return sorted(list(set(matches)))
 
@@ -57,7 +58,7 @@ def download_images(img_urls, dest_dir):
         f.write('<html><body>')
         for url in img_urls:
             f.write(f"<img src='./img{count}.jpg'/>")
-            response = urllib.request.urlretrieve(
+            urllib.request.urlretrieve(
                 f'https://code.google.com/{url}',
                 filename=f'{dest_dir}/img{count}.jpg')
             count += 1
