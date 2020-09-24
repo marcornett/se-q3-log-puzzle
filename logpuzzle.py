@@ -26,8 +26,20 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    # +++your code here+++
-    pass
+
+    pattern = re.compile(r'GET (\S*puzzle\S*) HTTP')
+
+    with open(filename, 'r') as f:
+        lines = f.read()
+        matches = pattern.findall(lines)
+
+    if filename == "place_code.google.com":
+        # ?  sort by the the last for characters in the string ?
+        special_pattern = re.compile(r'puzzle\/\w*-\w*-(\w*).jpg')
+        return sorted(list(set(matches)),
+                      key=lambda url: special_pattern.findall(url))
+    elif filename == "animal_code.google.com":
+        return sorted(list(set(matches)))
 
 
 def download_images(img_urls, dest_dir):
@@ -38,8 +50,19 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    # +++your code here+++
-    pass
+    if not os.path.exists(dest_dir):
+        os.mkdir(dest_dir)
+    count = 0
+    print('Retrieving...')
+    with open(f'{dest_dir}/index.html', 'w') as f:
+        f.write('<html><body>')
+        for url in img_urls:
+            f.write(f"<img src='./img{count}.jpg'/>")
+            urllib.request.urlretrieve(
+                f'https://code.google.com/{url}',
+                filename=f'{dest_dir}/img{count}.jpg')
+            count += 1
+        f.write('</body></html>')
 
 
 def create_parser():
@@ -61,13 +84,13 @@ def main(args):
         sys.exit(1)
 
     parsed_args = parser.parse_args(args)
-
     img_urls = read_urls(parsed_args.logfile)
 
     if parsed_args.todir:
         download_images(img_urls, parsed_args.todir)
     else:
         print('\n'.join(img_urls))
+    print(parsed_args.logfile)
 
 
 if __name__ == '__main__':
